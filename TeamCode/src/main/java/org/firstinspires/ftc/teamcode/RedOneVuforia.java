@@ -104,8 +104,8 @@ public class RedOneVuforia extends LinearOpMode {
         redTeamJewel();
         sleep(1000);
 
-        drive(.1,-5);
-        sleep(1000);
+        drive(.05,-3);
+        sleep(3000);
 
         if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
             if (vuMark == RelicRecoveryVuMark.LEFT) {
@@ -122,6 +122,8 @@ public class RedOneVuforia extends LinearOpMode {
             telemetry.addData("VuMark", "not visible");
         }
         telemetry.update();
+        sleep(1000);
+
 
         drive(.2,-18);
 
@@ -240,5 +242,8 @@ public class RedOneVuforia extends LinearOpMode {
         else{
             knockOutRedJewel();
         }
+    }
+    public void getVufPos(){
+
     }
 }
