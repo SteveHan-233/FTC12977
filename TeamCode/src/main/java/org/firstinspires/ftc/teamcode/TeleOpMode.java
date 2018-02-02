@@ -4,6 +4,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
+
 
 @TeleOp(name = "Tele Op")
 public class TeleOpMode extends LinearOpMode{
@@ -43,20 +45,22 @@ public class TeleOpMode extends LinearOpMode{
         relicMotor = hardwareMap.dcMotor.get("relicMotor");
 
         motorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        relicMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
         int stage = 0;
+        boolean isManual = false;
 
         waitForStart();
         while (opModeIsActive()) {
 
-            relicMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
+            //elevator
+            if (isManual){
+                armMotor.setPower(gamepad2.right_stick_y);
+            }
             if(gamepad1.a)
                 colorServo.setPosition(.3);
             if(gamepad1.b)
@@ -79,14 +83,18 @@ public class TeleOpMode extends LinearOpMode{
                 armMotor.setPower(1);
             }
 
-
-            while (gamepad2.right_stick_button) {
-                armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                armMotor.setPower(gamepad2.right_stick_y);
-                if (!gamepad2.right_stick_button) {
-                    armMotor.setPower(0);
+            if(gamepad2.right_stick_button){
+                if(isManual){
                     armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                    isManual = false;
+                    telemetry.addData("Manual Mode", "Not Active");
                 }
+                else{
+                    armMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                    isManual = true;
+                    telemetry.addData("Manual Mode", "Active");
+                }
+                while(gamepad2.right_stick_button);
             }
 
             telemetry.addData("Elevator Encoder Position", armMotor.getCurrentPosition());
@@ -105,12 +113,14 @@ public class TeleOpMode extends LinearOpMode{
                 handServo1.setPosition(.6);
                 handServo2.setPosition(.1);
             }
-            
 
-            //move on to the next stage.
+
+            // relic arm
+
             if (gamepad2.left_bumper) {
 
                 if(stage == 0){
+                    contractRelicServo();
                     relicMotor.setTargetPosition(RELIC_EXTENDED_POSITION);
                     relicMotor.setPower(1);
                     stage ++;
@@ -119,6 +129,8 @@ public class TeleOpMode extends LinearOpMode{
                     extendRelicServo();
                     stage++;
                 }
+
+                while(gamepad2.left_bumper);
             }
 
             if (gamepad2.right_bumper) {
@@ -131,6 +143,13 @@ public class TeleOpMode extends LinearOpMode{
                     contractRelicServo();
                     stage --;
                 }
+
+                while(gamepad2.right_bumper);
+            }
+
+            if(gamepad2.y){
+                extendRelicServoWithRelic();
+                stage = 2;
             }
 
             while (gamepad2.left_stick_button) {
@@ -138,6 +157,7 @@ public class TeleOpMode extends LinearOpMode{
                 relicMotor.setPower(gamepad2.left_stick_y / 2);
                 if (!gamepad2.left_stick_button) {
                     relicMotor.setPower(0);
+                    relicMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
                 }
             }
 
@@ -147,6 +167,9 @@ public class TeleOpMode extends LinearOpMode{
             if (gamepad2.right_trigger > 0) {
                 relicGrabber.setPosition(0);
             }
+
+
+            //drive
 
             if (gamepad1.right_bumper) {
                 speedFactor = 1;
@@ -159,10 +182,7 @@ public class TeleOpMode extends LinearOpMode{
             motorRight.setPower(gamepad1.left_stick_y * speedFactor);
             motorLeft.setPower(-gamepad1.right_stick_y * speedFactor);
 
-            //telemetry.addData("Right motor encoder Position", motorLeft.getCurrentPosition());
-            telemetry.addData("Left motor encoder Position", motorLeft.getCurrentPosition());
             telemetry.update();
-
         }
     }
 
