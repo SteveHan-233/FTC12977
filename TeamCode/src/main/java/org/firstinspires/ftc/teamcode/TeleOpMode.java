@@ -48,6 +48,7 @@ public class TeleOpMode extends LinearOpMode{
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        int stage = 0;
 
         waitForStart();
         while (opModeIsActive()) {
@@ -88,10 +89,7 @@ public class TeleOpMode extends LinearOpMode{
                 }
             }
 
-
-
-            int position = armMotor.getCurrentPosition();
-            telemetry.addData("Elevator Encoder Position", position);
+            telemetry.addData("Elevator Encoder Position", armMotor.getCurrentPosition());
             //0 at bottom, -2964 at top
 
             if (gamepad2.a) {
@@ -107,28 +105,32 @@ public class TeleOpMode extends LinearOpMode{
                 handServo1.setPosition(.6);
                 handServo2.setPosition(.1);
             }
+            
 
-            if (gamepad2.left_stick_x > 0) {
-                relicGrabber.setPosition(1);
-            }
-
-            if (gamepad2.left_stick_x < 0) {
-                relicGrabber.setPosition(0);
-            }
-
-
+            //move on to the next stage.
             if (gamepad2.left_bumper) {
-                relicMotor.setTargetPosition(RELIC_EXTENDED_POSITION);
-                relicMotor.setPower(1);
-            }
-            if (gamepad2.left_stick_y > 0){
-                relicMotor.setTargetPosition(RELIC_EXTENDED_POSITION/3);
-                relicMotor.setPower(1);
+
+                if(stage == 0){
+                    relicMotor.setTargetPosition(RELIC_EXTENDED_POSITION);
+                    relicMotor.setPower(1);
+                    stage ++;
+                }
+                else if(stage ==  1) {
+                    extendRelicServo();
+                    stage++;
+                }
             }
 
             if (gamepad2.right_bumper) {
-                relicMotor.setTargetPosition(RELIC_CONTRACTED_POSITION);
-                relicMotor.setPower(1);
+                if(stage == 1){
+                    relicMotor.setTargetPosition(RELIC_CONTRACTED_POSITION);
+                    relicMotor.setPower(.5);
+                    stage --;
+                }
+                else if(stage == 2){
+                    contractRelicServo();
+                    stage --;
+                }
             }
 
             while (gamepad2.left_stick_button) {
@@ -140,10 +142,10 @@ public class TeleOpMode extends LinearOpMode{
             }
 
             if (gamepad2.left_trigger > 0) {
-                extendRelicServo();
+                relicGrabber.setPosition(1);
             }
             if (gamepad2.right_trigger > 0) {
-                contractRelicServo();
+                relicGrabber.setPosition(0);
             }
 
             if (gamepad1.right_bumper) {
@@ -165,6 +167,11 @@ public class TeleOpMode extends LinearOpMode{
     }
 
     private void extendRelicServo(){
+        relicServo2.setPosition(.36);
+        relicServo1.setPosition(0); //extend
+    }
+
+    private void extendRelicServoWithRelic(){
         relicServo2.setPosition(.36);
         sleep(500);
         relicServo1.setPosition(0); //extend
