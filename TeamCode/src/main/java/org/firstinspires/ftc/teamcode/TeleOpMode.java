@@ -6,8 +6,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-//editing for nihal
-//test
 @TeleOp(name = "Tele Op")
 public class TeleOpMode extends LinearOpMode{
 
