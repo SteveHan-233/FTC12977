@@ -57,7 +57,7 @@ public class RedOneVuforia extends LinearOpMode {
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         parameters.vuforiaLicenseKey = "ARMl4sr/////AAAAGW7XCTx7E0rTsT4i0g6I9E8IY/EGEWdA5QHmgcnvsPFeuf+2cafgFWlJht6/m4ps4hdqUeDgqSaHurLTDfSET8oOvZUEOiMYDq2xVxNDQzW4Puz+Tl8pOFb1EfCrP28aBkcBkDfXDADiws03Ap/mD///h0HK5rVbe3KYhnefc0odh1F7ZZ1oxJy+A1w2Zb8JCXM/SWzAVvB1KEAnz87XRNeaJAon4c0gi9nLAdZlG0jnC6bx+m0140C76l14CTthmzSIdZMBkIb8/03aQIouFzLzz+K1fvXauT72TlDAbumhEak/s5pkN6L555F28Jf8KauwCnGyLnePxTm9/NKBQ4xW/bzWNpEdfY4CrBxFoSkq";
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.FRONT; // Use FRONT Camera (Change to BACK if you want to use that one)
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK; // Use FRONT Camera (Change to BACK if you want to use that one)
         parameters.cameraMonitorFeedback = VuforiaLocalizer.Parameters.CameraMonitorFeedback.AXES; // Display Axes
 
 
@@ -90,12 +90,6 @@ public class RedOneVuforia extends LinearOpMode {
 
         RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
 
-
-        liftUp();
-        openElevator();
-        sleep(1000);
-
-        setDown();
         closeElevator();
 
         sleep(500);
@@ -104,7 +98,7 @@ public class RedOneVuforia extends LinearOpMode {
         redTeamJewel();
         sleep(1000);
 
-        drive(.05,-3);
+        drive(.2,-15);
         sleep(3000);
 
         if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
@@ -125,7 +119,7 @@ public class RedOneVuforia extends LinearOpMode {
         sleep(1000);
 
 
-        drive(.2,-18);
+        drive(.2,-15);
 
         if(tempVuf.equals("left")){
             Turn(14);
@@ -218,23 +212,27 @@ public class RedOneVuforia extends LinearOpMode {
     }
 
     public void knockOutRedJewel(){
-        drive(1, 3);
-        colorServo.setPosition(0);
-        colorSensor.enableLed(false);
-        drive(.1,-3);
-    }
-
-    public void knockOutBlueJewel(){
         drive(1, -3);
         colorServo.setPosition(0);
         colorSensor.enableLed(false);
         drive(.1,3);
     }
 
+    public void knockOutBlueJewel(){
+        drive(1, 3);
+        colorServo.setPosition(0);
+        colorSensor.enableLed(false);
+        drive(.1,-3);
+    }
+
     public void redTeamJewel(){
-        colorServo.setPosition(.9);
+        colorServo.setPosition(1);
         sleep(2000);
         colorSensor.enableLed(true);
+
+        telemetry.addData("Red: ", colorSensor.red());
+        telemetry.addData("Blue: ", colorSensor.blue());
+        telemetry.update();
 
         if(colorSensor.red() > colorSensor.blue()){
             knockOutBlueJewel();
