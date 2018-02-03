@@ -104,33 +104,28 @@ public class RedOneVuforia extends LinearOpMode {
         if (vuMark != RelicRecoveryVuMark.UNKNOWN) {
             if (vuMark == RelicRecoveryVuMark.LEFT) {
                 telemetry.addData("VuMark", "left");
-                tempVuf = "left";
+                drive(.2,-10);
+                sleep(1000);
+                Turn(14);
+                sleep(2000);
             } else if (vuMark == RelicRecoveryVuMark.RIGHT) {
                 telemetry.addData("VuMark", "right");
-                tempVuf = "right";
+                drive(.2,-10);
+                sleep(1000);
+                Turn(22);
+                sleep(2000);
             } else if (vuMark == RelicRecoveryVuMark.CENTER) {
                 telemetry.addData("VuMark", "center");
-                tempVuf = "center";
+                drive(.2,-10);
+                sleep(1000);
+                Turn(18);
+                sleep(2000);
             }
         }else{
             telemetry.addData("VuMark", "not visible");
         }
         telemetry.update();
         sleep(1000);
-
-
-        drive(.2,-15);
-
-        if(tempVuf.equals("left")){
-            Turn(14);
-            sleep(2000);
-        }else if(tempVuf.equals("right")){
-            Turn(22);
-            sleep(2000);
-        }else if(tempVuf.equals("center")){
-            Turn(18);
-            sleep(2000);
-        }
 
 
         drive(.2,2);
