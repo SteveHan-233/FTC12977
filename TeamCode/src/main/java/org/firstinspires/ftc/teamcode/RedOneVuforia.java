@@ -82,15 +82,14 @@ public class RedOneVuforia extends LinearOpMode {
 
         /**This is where everything begins**/
 
-        relicTrackables.activate(); // Activate Vuforia
 
+        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
 
         waitForStart();
 
 
-        RelicRecoveryVuMark vuMark = RelicRecoveryVuMark.from(relicTemplate);
 
-        closeElevator();
+/**        closeElevator();
 
         sleep(500);
         liftUp();
@@ -100,6 +99,8 @@ public class RedOneVuforia extends LinearOpMode {
 
         drive(.2,-15);
         sleep(3000);
+**/
+        relicTrackables.activate(); // Activate Vuforia
 
         if (vuMark == RelicRecoveryVuMark.LEFT) {
             telemetry.addData("VuMark", "left");
@@ -123,11 +124,12 @@ public class RedOneVuforia extends LinearOpMode {
         }else {
             telemetry.addData("VuMark", "not visible");
         }
-        telemetry.update();
         sleep(1000);
+        telemetry.update();
+        sleep(10000);
 
 
-        drive(.2,2);
+/**        drive(.2,2);
         sleep(1000);
 
         openElevator();
@@ -137,7 +139,7 @@ public class RedOneVuforia extends LinearOpMode {
         stop();
 
 
-
+**/
     }
 
     public void drive(double power,double inch){
