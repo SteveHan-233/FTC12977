@@ -28,7 +28,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
  */
 
 
-@Autonomous(name="Red 1 Vuforia", group = "Tourney Codes")
+@Autonomous(name="Blue 1 Vuforia", group = "Vuforia")
 
 public class BlueOneVuforia extends LinearOpMode {
 
