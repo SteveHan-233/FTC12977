@@ -30,7 +30,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 @Autonomous(name="Red 1 Vuforia", group = "Tourney Codes")
 
-public class RedOneVuforia extends LinearOpMode {
+public class BlueOneVuforia extends LinearOpMode {
 
     private DcMotor motorLeft;
     private DcMotor motorRight;
@@ -93,16 +93,16 @@ public class RedOneVuforia extends LinearOpMode {
 
         waitForStart();
 
-
-
         closeElevator();
 
         sleep(500);
         liftUp();
 
-        redTeamJewel();
+        blueTeamJewel();
         sleep(1000);
 
+        drive(.3,25);
+        sleep(1500);
 
         telemetry.addLine("1 sec before while loop");
         telemetry.update();
@@ -145,20 +145,19 @@ public class RedOneVuforia extends LinearOpMode {
         sleep(2000);
 
         if(tempVuf.equals("left")){
-            drive(.3,-38);
+
             sleep(2000);
         }
         if(tempVuf.equals("right")){
-            drive(.3,-32);
+
             sleep(500);
         }
         if(tempVuf.equals("center")){
-            drive(.3, -28);
+
             sleep(2000);
         }
 
-        Turn(-8);
-        sleep(1000);
+
 
         drive(.2,2);
         sleep(1000);
@@ -239,20 +238,16 @@ public class RedOneVuforia extends LinearOpMode {
         drive(.1,-3);
     }
 
-    public void redTeamJewel(){
-        colorServo.setPosition(1);
+    public void blueTeamJewel(){
+        colorServo.setPosition(.9);
         sleep(2000);
         colorSensor.enableLed(true);
 
-        telemetry.addData("Red: ", colorSensor.red());
-        telemetry.addData("Blue: ", colorSensor.blue());
-        telemetry.update();
-
         if(colorSensor.red() > colorSensor.blue()){
-            knockOutBlueJewel();
+            knockOutRedJewel();
         }
         else{
-            knockOutRedJewel();
+            knockOutBlueJewel();
         }
     }
 

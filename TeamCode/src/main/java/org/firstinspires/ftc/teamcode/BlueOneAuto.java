@@ -70,8 +70,6 @@ public class BlueOneAuto extends LinearOpMode {
 
         blueTeamJewel();
 
-
-
         drive(.3,25);
         sleep(1500);
 

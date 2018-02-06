@@ -30,7 +30,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
 @Autonomous(name="Red 1 Vuforia", group = "Tourney Codes")
 
-public class RedOneVuforia extends LinearOpMode {
+public class RedTwoVuforia extends LinearOpMode {
 
     private DcMotor motorLeft;
     private DcMotor motorRight;
@@ -103,7 +103,6 @@ public class RedOneVuforia extends LinearOpMode {
         redTeamJewel();
         sleep(1000);
 
-
         telemetry.addLine("1 sec before while loop");
         telemetry.update();
 
@@ -145,26 +144,27 @@ public class RedOneVuforia extends LinearOpMode {
         sleep(2000);
 
         if(tempVuf.equals("left")){
-            drive(.3,-38);
+            Turn(18);
             sleep(2000);
         }
         if(tempVuf.equals("right")){
-            drive(.3,-32);
+            Turn(21);
+            sleep(1000);
+            drive(.2,-4);
+            sleep(1000);
+            Turn(3);
             sleep(500);
         }
         if(tempVuf.equals("center")){
-            drive(.3, -28);
+            Turn(20);
             sleep(2000);
         }
-
-        Turn(-8);
-        sleep(1000);
 
         drive(.2,2);
         sleep(1000);
 
         openElevator();
-        sleep(1000);
+        sleep(500);
 
         drive(.2,-2);
         stop();
@@ -202,6 +202,19 @@ public class RedOneVuforia extends LinearOpMode {
         motorRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motorLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         motorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    }
+
+    public void turnLeft(double inch){
+        motorRight.setTargetPosition((int)(motorRight.getCurrentPosition() + inch * ticksPerInch));
+
+        motorRight.setPower(.1);
+        while (motorRight.isBusy() && motorLeft.isBusy());
+    }
+
+    public void turnRight(double inch){
+        motorLeft.setTargetPosition((int)(motorLeft.getCurrentPosition() + inch * ticksPerInch));
+
+        motorLeft.setPower(.1);
     }
 
     public void closeElevator(){
@@ -255,5 +268,7 @@ public class RedOneVuforia extends LinearOpMode {
             knockOutRedJewel();
         }
     }
+    public void getVufPos(){
 
+    }
 }

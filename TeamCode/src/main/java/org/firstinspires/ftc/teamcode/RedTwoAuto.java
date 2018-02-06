@@ -59,11 +59,6 @@ public class RedTwoAuto extends LinearOpMode {
 
         waitForStart();
 
-        liftUp();
-        openElevator();
-        sleep(1000);
-
-        setDown();
         closeElevator();
 
         sleep(500);
