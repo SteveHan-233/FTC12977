@@ -65,22 +65,27 @@ public class TeleOpMode extends LinearOpMode{
             if(gamepad1.b)
                 colorServo.setPosition(.7);
 
-            if (gamepad2.dpad_up && !gamepad2.right_bumper) {
+            if (gamepad2.dpad_up) {
                 armMotor.setTargetPosition(ELEVATOR_TOP_POSITION);
                 armMotor.setPower(1);
             }
-            if (gamepad2.dpad_down && !gamepad2.right_bumper) {
+            if (gamepad2.dpad_down) {
                 armMotor.setTargetPosition(ELEVATOR_BOTTOM_POSITION);
                 armMotor.setPower(1);
             }
-            if (gamepad2.dpad_left && !gamepad2.right_bumper) {
-                armMotor.setTargetPosition(ELEVATOR_TOP_POSITION/3);
+            if (gamepad2.dpad_left) {
+                armMotor.setTargetPosition(ELEVATOR_TOP_POSITION/20);
                 armMotor.setPower(1);
             }
-            if (gamepad2.dpad_right && !gamepad2.right_bumper) {
+            if (gamepad2.dpad_right) {
+                armMotor.setTargetPosition(ELEVATOR_TOP_POSITION/2);
+                armMotor.setPower(1);
+            }
+            if (gamepad2.left_stick_button){
                 armMotor.setTargetPosition(ELEVATOR_TOP_POSITION*2/3);
                 armMotor.setPower(1);
             }
+
 
             if(gamepad2.right_stick_button){
                 if(isManual){
@@ -202,3 +207,4 @@ public class TeleOpMode extends LinearOpMode{
     }
 
 }
+
