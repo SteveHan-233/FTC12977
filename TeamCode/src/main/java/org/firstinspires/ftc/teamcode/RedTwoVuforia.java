@@ -49,7 +49,7 @@ public class RedTwoVuforia extends LinearOpMode {
     private final double wheelDiamerter = 6;
     private final double pi = Math.PI;
     private final double wheelCircumference = wheelDiamerter * pi;
-    private final int ELEVATOR_TOP_POSITION = -2900/2;
+    private final int ELEVATOR_TOP_POSITION = -1100;
     private final int ELEVATOR_BOTTOM_POSITION = 0;
 
     //The value below shows how many ticks there are per inch
@@ -101,14 +101,9 @@ public class RedTwoVuforia extends LinearOpMode {
         liftUp();
 
         redTeamJewel();
+
+        drive(.2,-15);
         sleep(1000);
-
-        telemetry.addLine("1 sec before while loop");
-        telemetry.update();
-
-
-        sleep(1000);
-
 
         // vuforia
         while (opModeIsActive() && tempVuf.equals("none"))
@@ -144,28 +139,29 @@ public class RedTwoVuforia extends LinearOpMode {
         sleep(2000);
 
         if(tempVuf.equals("left")){
-            Turn(18);
+            drive(.3,-32);
             sleep(2000);
         }
         if(tempVuf.equals("right")){
-            Turn(21);
-            sleep(1000);
-            drive(.2,-4);
-            sleep(1000);
-            Turn(3);
+            drive(.3,-16);
             sleep(500);
         }
         if(tempVuf.equals("center")){
-            Turn(20);
+            drive(.3, -24);
             sleep(2000);
         }
 
-        drive(.2,2);
+        Turn(-8);
+        sleep(1000);
+
+        setDown();
         sleep(1000);
 
         openElevator();
-        sleep(500);
+        sleep(1000);
 
+        drive(.2,-2);
+        drive(.2,2);
         drive(.2,-2);
         stop();
 
@@ -204,19 +200,6 @@ public class RedTwoVuforia extends LinearOpMode {
         motorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    public void turnLeft(double inch){
-        motorRight.setTargetPosition((int)(motorRight.getCurrentPosition() + inch * ticksPerInch));
-
-        motorRight.setPower(.1);
-        while (motorRight.isBusy() && motorLeft.isBusy());
-    }
-
-    public void turnRight(double inch){
-        motorLeft.setTargetPosition((int)(motorLeft.getCurrentPosition() + inch * ticksPerInch));
-
-        motorLeft.setPower(.1);
-    }
-
     public void closeElevator(){
         handServo1.setPosition(0);
         handServo2.setPosition(1);
@@ -239,17 +222,23 @@ public class RedTwoVuforia extends LinearOpMode {
     }
 
     public void knockOutRedJewel(){
-        drive(1, -3);
+        drive(.1, -3);
         colorServo.setPosition(0);
         colorSensor.enableLed(false);
         drive(.1,3);
+
     }
 
     public void knockOutBlueJewel(){
-        drive(1, 3);
+        drive(.1, 3);
         colorServo.setPosition(0);
         colorSensor.enableLed(false);
         drive(.1,-3);
+
+    }
+    public void stopRobot(){
+        motorLeft.setPower(0);
+        motorRight.setPower(0);
     }
 
     public void redTeamJewel(){
@@ -268,7 +257,5 @@ public class RedTwoVuforia extends LinearOpMode {
             knockOutRedJewel();
         }
     }
-    public void getVufPos(){
 
-    }
 }

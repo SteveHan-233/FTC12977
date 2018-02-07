@@ -28,7 +28,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
  */
 
 
-@Autonomous(name="Red 1 Vuforia", group = "Vuforia")
+@Autonomous(name="Red 1 Vuforia", group = "aVuforia")
 
 public class RedOneVuforia extends LinearOpMode {
 
@@ -93,8 +93,6 @@ public class RedOneVuforia extends LinearOpMode {
 
         waitForStart();
 
-
-
         closeElevator();
 
         sleep(500);
@@ -103,13 +101,12 @@ public class RedOneVuforia extends LinearOpMode {
         redTeamJewel();
         sleep(1000);
 
-
         telemetry.addLine("1 sec before while loop");
         telemetry.update();
-
-
         sleep(1000);
 
+        drive(.2,-15);
+        sleep(3000);
 
         // vuforia
         while (opModeIsActive() && tempVuf.equals("none"))
@@ -145,27 +142,35 @@ public class RedOneVuforia extends LinearOpMode {
         sleep(2000);
 
         if(tempVuf.equals("left")){
-            drive(.3,-38);
-            sleep(2000);
+            Turn(16);
+            sleep(1000);
+            drive(.2,4);
         }
         if(tempVuf.equals("right")){
-            drive(.3,-32);
+            Turn(21);
+            sleep(1000);
+            drive(.2,-4);
+            sleep(1000);
+            Turn(3);
             sleep(500);
         }
         if(tempVuf.equals("center")){
-            drive(.3, -28);
-            sleep(2000);
+            Turn(20);
+            sleep(1000);
         }
-
-        Turn(-8);
-        sleep(1000);
 
         drive(.2,2);
         sleep(1000);
 
         openElevator();
+        sleep(500);
+
+        drive(.2,-6);
+        setDown();
+        closeElevator();
         sleep(1000);
 
+        drive(.2,5);
         drive(.2,-2);
         stop();
 
@@ -204,6 +209,19 @@ public class RedOneVuforia extends LinearOpMode {
         motorRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
+    public void turnLeft(double inch){
+        motorRight.setTargetPosition((int)(motorRight.getCurrentPosition() + inch * ticksPerInch));
+
+        motorRight.setPower(.1);
+        while (motorRight.isBusy() && motorLeft.isBusy());
+    }
+
+    public void turnRight(double inch){
+        motorLeft.setTargetPosition((int)(motorLeft.getCurrentPosition() + inch * ticksPerInch));
+
+        motorLeft.setPower(.1);
+    }
+
     public void closeElevator(){
         handServo1.setPosition(0);
         handServo2.setPosition(1);
@@ -226,17 +244,27 @@ public class RedOneVuforia extends LinearOpMode {
     }
 
     public void knockOutRedJewel(){
-        drive(1, -3);
+        drive(.1, -3);
         colorServo.setPosition(0);
         colorSensor.enableLed(false);
         drive(.1,3);
+
+        stopRobot();
+        sleep(500);
     }
 
     public void knockOutBlueJewel(){
-        drive(1, 3);
+        drive(.1, 3);
         colorServo.setPosition(0);
         colorSensor.enableLed(false);
         drive(.1,-3);
+
+        stopRobot();
+        sleep(500);
+    }
+    public void stopRobot(){
+        motorLeft.setPower(0);
+        motorRight.setPower(0);
     }
 
     public void redTeamJewel(){
@@ -255,5 +283,7 @@ public class RedOneVuforia extends LinearOpMode {
             knockOutRedJewel();
         }
     }
+    public void getVufPos(){
 
+    }
 }

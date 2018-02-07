@@ -74,14 +74,14 @@ public class TeleOpMode extends LinearOpMode{
                 armMotor.setPower(1);
             }
             if (gamepad2.dpad_left) {
-                armMotor.setTargetPosition(ELEVATOR_TOP_POSITION/20);
+                armMotor.setTargetPosition(ELEVATOR_TOP_POSITION/6);
                 armMotor.setPower(1);
             }
             if (gamepad2.dpad_right) {
-                armMotor.setTargetPosition(ELEVATOR_TOP_POSITION/2);
+                armMotor.setTargetPosition(ELEVATOR_TOP_POSITION/2 - 200);
                 armMotor.setPower(1);
             }
-            if (gamepad2.left_stick_button){
+            if (gamepad1.dpad_up){
                 armMotor.setTargetPosition(ELEVATOR_TOP_POSITION*2/3);
                 armMotor.setPower(1);
             }
@@ -104,7 +104,7 @@ public class TeleOpMode extends LinearOpMode{
             telemetry.addData("Elevator Encoder Position", armMotor.getCurrentPosition());
             //0 at bottom, -2964 at top
 
-            if (gamepad2.a) {
+            if (gamepad2.x) {
                 handServo1.setPosition(.4);
                 handServo2.setPosition(.3);
             }
@@ -113,7 +113,7 @@ public class TeleOpMode extends LinearOpMode{
                 handServo2.setPosition(1);
             }
 
-            if (gamepad2.x) {
+            if (gamepad2.a) {
                 handServo1.setPosition(.6);
                 handServo2.setPosition(.1);
             }
