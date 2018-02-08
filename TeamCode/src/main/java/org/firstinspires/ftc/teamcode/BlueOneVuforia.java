@@ -159,9 +159,7 @@ public class BlueOneVuforia extends LinearOpMode {
         }
 
 
-        drive(.2,5);
-
-        drive(.2,2);
+        drive(.2,9);
         sleep(1000);
 
         openElevator();

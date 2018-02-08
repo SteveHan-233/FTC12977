@@ -195,12 +195,12 @@ public class TeleOpMode extends LinearOpMode{
     }
 
     private void extendRelicServo(){
-        relicServo2.setPosition(.63);
+        relicServo2.setPosition(.65);
         relicServo1.setPosition(0); //extend
     }
 
     private void extendRelicServoWithRelic(){
-        relicServo2.setPosition(.63);
+        relicServo2.setPosition(.68);
         sleep(500);
         relicServo1.setPosition(0); //extend
     }
