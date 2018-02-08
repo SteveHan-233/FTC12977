@@ -117,7 +117,7 @@ public class TeleOpMode extends LinearOpMode{
                 handServo2.setPosition(.1);
             }
 
-            if (gamepad1.dpad_down){
+            if (gamepad1.dpad_left && gamepad1.dpad_right){
                 armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             }
@@ -125,7 +125,7 @@ public class TeleOpMode extends LinearOpMode{
 
             // relic arm
 
-            if (gamepad2.left_bumper) {
+            if (gamepad2.right_bumper) {
 
                 if(stage == 0){
                     contractRelicServo();
@@ -138,10 +138,10 @@ public class TeleOpMode extends LinearOpMode{
                     stage++;
                 }
 
-                while(gamepad2.left_bumper);
+                while(gamepad2.right_bumper);
             }
 
-            if (gamepad2.right_bumper) {
+            if (gamepad2.left_bumper) {
                 if(stage == 1){
                     relicMotor.setTargetPosition(RELIC_CONTRACTED_POSITION);
                     relicMotor.setPower(.5);
@@ -152,7 +152,7 @@ public class TeleOpMode extends LinearOpMode{
                     stage --;
                 }
 
-                while(gamepad2.right_bumper);
+                while(gamepad2.left_bumper);
             }
 
             if(gamepad2.y){
@@ -195,7 +195,7 @@ public class TeleOpMode extends LinearOpMode{
     }
 
     private void extendRelicServo(){
-        relicServo2.setPosition(.48);
+        relicServo2.setPosition(.39);
         relicServo1.setPosition(0); //extend
     }
 
