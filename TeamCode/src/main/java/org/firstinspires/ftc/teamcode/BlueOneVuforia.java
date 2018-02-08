@@ -99,9 +99,8 @@ public class BlueOneVuforia extends LinearOpMode {
         liftUp();
 
         blueTeamJewel();
-        sleep(1000);
 
-        drive(.3,25);
+        drive(.2,-6);
         sleep(1500);
 
         telemetry.addLine("1 sec before while loop");
@@ -142,22 +141,25 @@ public class BlueOneVuforia extends LinearOpMode {
 
         telemetry.addLine("Done with while loop");
         telemetry.update();
+        drive(.4,28);
         sleep(2000);
 
         if(tempVuf.equals("left")){
-
+            Turn(3);
             sleep(2000);
         }
         if(tempVuf.equals("right")){
-
+            Turn(5);
             sleep(500);
         }
         if(tempVuf.equals("center")){
-
+            Turn(9);
             sleep(2000);
+            drive(.2,5);
         }
 
 
+        drive(.2,5);
 
         drive(.2,2);
         sleep(1000);
@@ -225,21 +227,21 @@ public class BlueOneVuforia extends LinearOpMode {
     }
 
     public void knockOutRedJewel(){
-        drive(1, -3);
+        drive(.3,-6);
         colorServo.setPosition(0);
         colorSensor.enableLed(false);
-        drive(.1,3);
+
     }
 
     public void knockOutBlueJewel(){
-        drive(1, 3);
+        drive(.1, 3);
         colorServo.setPosition(0);
         colorSensor.enableLed(false);
-        drive(.1,-3);
+        drive(.3,-9);
     }
 
     public void blueTeamJewel(){
-        colorServo.setPosition(.9);
+        colorServo.setPosition(1);
         sleep(2000);
         colorSensor.enableLed(true);
 
