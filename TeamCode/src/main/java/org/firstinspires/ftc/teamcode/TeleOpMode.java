@@ -26,9 +26,8 @@ public class TeleOpMode extends LinearOpMode{
 
     private final int ELEVATOR_TOP_POSITION = -2930;
     private final int ELEVATOR_BOTTOM_POSITION = 0;
-    private final int RELIC_EXTENDED_POSITION = -2600;
+    private final int RELIC_EXTENDED_POSITION = -2000;
     private final int RELIC_CONTRACTED_POSITION = 50;
-
 
     public void runOpMode() throws InterruptedException {
 
@@ -118,6 +117,11 @@ public class TeleOpMode extends LinearOpMode{
                 handServo2.setPosition(.1);
             }
 
+            if (gamepad1.dpad_down){
+                armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            }
+
 
             // relic arm
 
@@ -191,7 +195,7 @@ public class TeleOpMode extends LinearOpMode{
     }
 
     private void extendRelicServo(){
-        relicServo2.setPosition(.39);
+        relicServo2.setPosition(.48);
         relicServo1.setPosition(0); //extend
     }
 
