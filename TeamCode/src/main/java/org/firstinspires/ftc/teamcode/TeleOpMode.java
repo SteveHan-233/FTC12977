@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-//lol
 @TeleOp(name = "Tele Op")
 public class TeleOpMode extends LinearOpMode{
 
@@ -206,6 +205,7 @@ public class TeleOpMode extends LinearOpMode{
     }
 
     private void contractRelicServo(){
+        relicMotor.setTargetPosition(RELIC_EXTENDED_POSITION/3);
         relicServo1.setPosition(.85); //contract
         relicServo2.setPosition(0);
     }

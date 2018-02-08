@@ -149,11 +149,12 @@ public class BlueOneVuforia extends LinearOpMode {
             sleep(2000);
         }
         if(tempVuf.equals("right")){
-            Turn(5);
+            Turn(10);
             sleep(500);
+            drive(.2,5);
         }
         if(tempVuf.equals("center")){
-            Turn(9);
+            Turn(5);
             sleep(2000);
             drive(.2,5);
         }
