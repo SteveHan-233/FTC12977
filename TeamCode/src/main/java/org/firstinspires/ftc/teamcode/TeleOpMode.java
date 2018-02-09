@@ -55,9 +55,11 @@ public class TeleOpMode extends LinearOpMode{
         while (opModeIsActive()) {
 
             //elevator
+
             if (isManual){
                 armMotor.setPower(gamepad2.right_stick_y);
             }
+
             if(gamepad1.a)
                 colorServo.setPosition(.3);
             if(gamepad1.b)
@@ -159,13 +161,12 @@ public class TeleOpMode extends LinearOpMode{
                 stage = 2;
             }
 
-            while (gamepad2.left_stick_button) {
-                relicMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                relicMotor.setPower(gamepad2.left_stick_y / 2);
-                if (!gamepad2.left_stick_button) {
-                    relicMotor.setPower(0);
-                    relicMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                }
+            if (gamepad2.left_stick_y > 0){
+                armMotor.setTargetPosition(RELIC_EXTENDED_POSITION/3);
+            }
+
+            if (gamepad2.left_stick_y < 0){
+                armMotor.setTargetPosition(RELIC_EXTENDED_POSITION);
             }
 
             if (gamepad2.left_trigger > 0) {
@@ -205,7 +206,6 @@ public class TeleOpMode extends LinearOpMode{
     }
 
     private void contractRelicServo(){
-        relicMotor.setTargetPosition(RELIC_EXTENDED_POSITION/3);
         relicServo1.setPosition(.85); //contract
         relicServo2.setPosition(0);
     }
