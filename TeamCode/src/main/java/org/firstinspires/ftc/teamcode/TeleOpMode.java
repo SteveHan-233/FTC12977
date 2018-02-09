@@ -21,7 +21,6 @@ public class TeleOpMode extends LinearOpMode{
     private Servo handServo2;
     private double speedFactor = 0;
     private Servo colorServo;
-    private boolean temp = false;
 
     private final int ELEVATOR_TOP_POSITION = -2930;
     private final int ELEVATOR_BOTTOM_POSITION = 0;
@@ -45,6 +44,8 @@ public class TeleOpMode extends LinearOpMode{
         relicMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        motorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motorLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
@@ -160,15 +161,19 @@ public class TeleOpMode extends LinearOpMode{
                 extendRelicServoWithRelic();
                 stage = 2;
             }
-
+/*
             if (gamepad2.left_stick_y > 0){
-                armMotor.setTargetPosition(RELIC_EXTENDED_POSITION/3);
+                armMotor.setTargetPosition(RELIC_EXTENDED_POSITION/2);
+            }
+
+            if (gamepad2.left_stick_button){
+                armMotor.setTargetPosition(RELIC_EXTENDED_POSITION/2);
             }
 
             if (gamepad2.left_stick_y < 0){
                 armMotor.setTargetPosition(RELIC_EXTENDED_POSITION);
             }
-
+*/
             if (gamepad2.left_trigger > 0) {
                 relicGrabber.setPosition(1);
             }

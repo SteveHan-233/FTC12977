@@ -141,26 +141,30 @@ public class BlueOneVuforia extends LinearOpMode {
 
         telemetry.addLine("Done with while loop");
         telemetry.update();
-        drive(.4,28);
+        drive(.4,23);
         sleep(2000);
 
         if(tempVuf.equals("left")){
             Turn(3);
             sleep(2000);
+            drive(.2,9);
         }
         if(tempVuf.equals("right")){
-            Turn(10);
+            drive(.2,8);
+            sleep(1000);
+            Turn(15);
+            sleep(1000);
+            drive(.2,8);
+            Turn(-4);
             sleep(500);
-            drive(.2,5);
+            drive(.2,3);
         }
         if(tempVuf.equals("center")){
             Turn(5);
             sleep(2000);
-            drive(.2,5);
+            drive(.2,14);
         }
 
-
-        drive(.2,9);
         sleep(1000);
 
         openElevator();
