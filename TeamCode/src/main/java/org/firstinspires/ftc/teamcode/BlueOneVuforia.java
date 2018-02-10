@@ -22,7 +22,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefau
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 
-//lol
 /**
  * Created by nihal on 1/17/18.
  */
@@ -145,19 +144,20 @@ public class BlueOneVuforia extends LinearOpMode {
         sleep(2000);
 
         if(tempVuf.equals("left")){
-            Turn(3);
+            Turn(2);
             sleep(2000);
             drive(.2,9);
         }
         if(tempVuf.equals("right")){
-            drive(.2,8);
+            drive(.2,2);
             sleep(1000);
-            Turn(15);
+            Turn(11);
             sleep(1000);
-            drive(.2,8);
+            drive(.2,15);
+            Turn(-5);
+            drive(.2,-2);
             Turn(-4);
-            sleep(500);
-            drive(.2,3);
+            drive(.2,4);
         }
         if(tempVuf.equals("center")){
             Turn(5);
@@ -196,8 +196,8 @@ public class BlueOneVuforia extends LinearOpMode {
 
         motorRight.setTargetPosition((int)(motorRight.getCurrentPosition() + inch * ticksPerInch));
         motorLeft.setTargetPosition((int)(motorLeft.getCurrentPosition() - inch * ticksPerInch));
-        motorLeft.setPower(0.2);
-        motorRight.setPower(0.2);
+        motorLeft.setPower(0.1);
+        motorRight.setPower(0.1);
         while (motorRight.isBusy() && motorLeft.isBusy());
     }
 

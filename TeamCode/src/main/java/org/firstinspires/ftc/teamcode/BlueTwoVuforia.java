@@ -45,7 +45,6 @@ public class BlueTwoVuforia extends LinearOpMode {
 
     //position values
     private final static int revTicks = 1120;
-    private final static int gearValue = 2;
     private final double wheelDiamerter = 6;
     private final double pi = Math.PI;
     private final double wheelCircumference = wheelDiamerter * pi;
@@ -100,7 +99,7 @@ public class BlueTwoVuforia extends LinearOpMode {
 
         blueTeamJewel();
 
-        drive(.3,-5);
+        drive(.3,-6);
         sleep(1500);
 
         telemetry.addLine("1 sec before while loop");
@@ -143,22 +142,31 @@ public class BlueTwoVuforia extends LinearOpMode {
         telemetry.update();
 
         if(tempVuf.equals("left")){
-            drive(.3,30);
-            sleep(2000);
+            drive(.3,42);
+            sleep(500);
+            Turn(-4);
+            sleep(1000);
+            drive(.3,-6);
+            sleep(500);
+            Turn(-5);
         }
         if(tempVuf.equals("center")){
             drive(.3,39);
             sleep(500);
+            Turn(-9);
+            sleep(1000);
         }
         if(tempVuf.equals("right")){
             drive(.3,45);
-            sleep(2000);
+            sleep(500);
+            Turn(-9);
+            sleep(1000);
         }
 
-        Turn(-9);
-        sleep(1000);
 
-        drive(.2,8);
+        sleep(500);
+        drive(.2,6);
+        sleep(500);
 
         openElevator();
         sleep(1000);
@@ -226,17 +234,17 @@ public class BlueTwoVuforia extends LinearOpMode {
     }
 
     public void knockOutRedJewel(){
-        drive(.1, -3);
+        drive(.3,-6);
         colorServo.setPosition(0);
         colorSensor.enableLed(false);
-        drive(.1,3);
+
     }
 
     public void knockOutBlueJewel(){
         drive(.1, 3);
         colorServo.setPosition(0);
         colorSensor.enableLed(false);
-        drive(.1,-3);
+        drive(.3,-9);
     }
 
     public void blueTeamJewel(){

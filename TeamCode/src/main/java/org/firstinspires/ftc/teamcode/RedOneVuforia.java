@@ -101,12 +101,9 @@ public class RedOneVuforia extends LinearOpMode {
         redTeamJewel();
         sleep(1000);
 
-        telemetry.addLine("1 sec before while loop");
-        telemetry.update();
-        sleep(1000);
 
         drive(.2,-15);
-        sleep(3000);
+        sleep(1000);
 
         // vuforia
         while (opModeIsActive() && tempVuf.equals("none"))
@@ -139,7 +136,6 @@ public class RedOneVuforia extends LinearOpMode {
 
         telemetry.addLine("Done with while loop");
         telemetry.update();
-        sleep(2000);
 
         if(tempVuf.equals("left")){
             Turn(16);
