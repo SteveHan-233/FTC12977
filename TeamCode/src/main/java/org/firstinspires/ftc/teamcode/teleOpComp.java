@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-@TeleOp(name = "Tele Op")
+@TeleOp(name = "Tele Op Competition")
 public class teleOpComp extends LinearOpMode{
 
     private DcMotor motorLeft;
@@ -130,13 +130,18 @@ public class teleOpComp extends LinearOpMode{
             if (gamepad2.right_bumper) {
 
                 if(stage == 0){
-                    contractRelicServo();
+                    contractRelicServo1();
+                    contractRelicServo2();
                     relicMotor.setTargetPosition(RELIC_EXTENDED_POSITION);
                     relicMotor.setPower(1);
                     stage ++;
                 }
                 else if(stage ==  1) {
-                    extendRelicServo();
+                    extendRelicServo1();
+                    stage++;
+                }
+                else if(stage == 2){
+                    extendRelicServo2();
                     stage++;
                 }
 
@@ -149,8 +154,12 @@ public class teleOpComp extends LinearOpMode{
                     relicMotor.setPower(.5);
                     stage --;
                 }
+                else if(stage == 3){
+                    contractRelicServo2();
+                    stage --;
+                }
                 else if(stage == 2){
-                    contractRelicServo();
+                    contractRelicServo1();
                     stage --;
                 }
 
@@ -195,16 +204,26 @@ public class teleOpComp extends LinearOpMode{
         }
     }
 
-    private void extendRelicServo(){
+    private void extendRelicServo1(){
         relicServo1.setPosition(0); //extend
+    }
+
+    private void extendRelicServo2(){
+        relicServo2.setPosition(.67);
     }
 
     private void extendRelicServoWithRelic(){
+        relicServo2.setPosition(.67);
+        sleep(500);
         relicServo1.setPosition(0); //extend
     }
 
-    private void contractRelicServo(){
+    private void contractRelicServo1(){
         relicServo1.setPosition(.85); //contract
+    }
+
+    private void contractRelicServo2(){
+        relicServo2.setPosition(0);
     }
 
 }
