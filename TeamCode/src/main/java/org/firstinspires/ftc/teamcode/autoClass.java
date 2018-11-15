@@ -14,24 +14,55 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
+import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.Position;
 import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
+import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
+import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+
+import java.util.List;
+import java.util.Locale;
 
 @Autonomous(name="Drive Avoid Imu", group="Exercises")
 //@Disabled
 public class autoClass extends LinearOpMode
 {
+    //normal instansiation
     private DcMotor bottomLeft;
     private DcMotor bottomRight;
     private DcMotor topLeft;
     private DcMotor topRight;
-    BNO055IMU imu;
+    private static BNO055IMU imu;
     Orientation lastAngles = new Orientation();
     double globalAngle, power = .30, correction;
+
+    //encoder info
+    private final static int revTicks = 288;
+    private final double wheelDiamerter = 4;
+    private final double pi = Math.PI;
+    private final double wheelCircumference = wheelDiamerter * pi;
+
+    //The value below shows how many ticks there are per inch
+    private double ticksPerInch = revTicks/wheelCircumference;
+
+    //Gyrostuff
+    static Orientation angles;
+    static double heading = 0.0;
+
+    //Vuforia instansiation
+    private static final String TFOD_MODEL_ASSET = "RoverRuckus.tflite";
+    private static final String LABEL_GOLD_MINERAL = "Gold Mineral";
+    private static final String LABEL_SILVER_MINERAL = "Silver Mineral";
+    private static final String VUFORIA_KEY = "ARMl4sr/////AAAAGW7XCTx7E0rTsT4i0g6I9E8IY/EGEWdA5QHmgcnvsPFeuf+2cafgFWlJht6/m4ps4hdqUeDgqSaHurLTDfSET8oOvZUEOiMYDq2xVxNDQzW4Puz+Tl8pOFb1EfCrP28aBkcBkDfXDADiws03Ap/mD///h0HK5rVbe3KYhnefc0odh1F7ZZ1oxJy+A1w2Zb8JCXM/SWzAVvB1KEAnz87XRNeaJAon4c0gi9nLAdZlG0jnC6bx+m0140C76l14CTthmzSIdZMBkIb8/03aQIouFzLzz+K1fvXauT72TlDAbumhEak/s5pkN6L555F28Jf8KauwCnGyLnePxTm9/NKBQ4xW/bzWNpEdfY4CrBxFoSkq";
+
+    private TFObjectDetector tfod;
+    private VuforiaLocalizer vuforia;
+
 
     // called when init button is  pressed.
     @Override
@@ -53,6 +84,33 @@ public class autoClass extends LinearOpMode
         topLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         topRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
+        initVuforia();
+
+        if (ClassFactory.getInstance().canCreateTFObjectDetector()) {
+            initTfod();
+        } else {
+            telemetry.addData("Sorry!", "This device is not compatible with TFOD");
+        }
+
+        /** Wait for the game to begin */
+        telemetry.addData(">", "Press Play to start tracking");
+        telemetry.update();
+
+        /**
+         //////////////////////////////////////////////////////////////////////////////////////////////
+         //////////////////////////////////////////////////////////////////////////////////////////////
+           _____                                                       _          __  __  __  __  __
+          / ____|                                                     | |        / _|/ _|/ _|/ _|/ _|
+         | |  __ _   _ _ __ ___  ___  ___ ___  _ __   ___          ___| |_ _   _| |_| |_| |_| |_| |_
+         | | |_ | | | | '__/ _ \/ __|/ __/ _ \| '_ \ / _ \        / __| __| | | |  _|  _|  _|  _|  _|
+         | |__| | |_| | | | (_) \__ \ (_| (_) | |_) |  __/        \__ \ |_| |_| | | | | | | | | | |
+         \_____|\__,  |_|  \___/|___/\___\___/| .__/ \___|        |___/\__|\__,_|_| |_| |_| |_| |_|
+                  __/ |                       | |
+                 |___ /                       |_|
+         //////////////////////////////////////////////////////////////////////////////////////////////
+         //////////////////////////////////////////////////////////////////////////////////////////////
+         **/
+
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
 
         parameters.mode = BNO055IMU.SensorMode.IMU;
@@ -71,17 +129,18 @@ public class autoClass extends LinearOpMode
         telemetry.update();
 
         // make sure the imu gyro is calibrated before continuing.
-        while (!isStopRequested() && !imu.isGyroCalibrated())
+        /**while (!isStopRequested() && !imu.isGyroCalibrated())
         {
             sleep(50);
             idle();
-        }
+        }*/
 
         telemetry.addData("Mode", "waiting for start");
         telemetry.addData("imu calib status", imu.getCalibrationStatus().toString());
         telemetry.update();
 
         // wait for start button.
+
 
         waitForStart();
 
@@ -92,133 +151,201 @@ public class autoClass extends LinearOpMode
 
         // drive until end of period.
 
+        /**
+        ////////////////////////////////////////////////////////////////////////////
+         ////////////////////////////////////////////////////////////////////////////
+         __      __   __          _                    _          __  __  __  __  __
+         \ \    / / / _|         (_)                  | |        / _|/ _|/ _|/ _|/ _|
+         \ \  / /  | |_ ___  _ __ _  __ _          ___| |_ _   _| |_| |_| |_| |_| |_
+         \ \/ /| | |  _/ _ \|'__| |/ _` |        / __| __| | | |  _|  _|  _|  _|  _|
+         \  /| |_| | || (_)| |  | | (_| |        \__ \ |_| |_| | | | | | | | | | |
+         \/  \__,_|_| \___/|_|  |_|\__,_|        |___/\__|\__,_|_| |_| |_| |_| |_|
+         ///////////////////////////////////////////////////////////////////////////
+         ////////////////////////////////////////////////////////////////////////////
+         **/
+
+
+
+        if (tfod != null) {
+            tfod.activate();
+        }
+
         while (opModeIsActive())
         {
-            // Use gyro to drive in a straight line.
-            correction = checkDirection();
 
-            telemetry.addData("1 imu heading", lastAngles.firstAngle);
-            telemetry.addData("2 global heading", globalAngle);
-            telemetry.addData("3 correction", correction);
+            if (tfod != null) {
+                // getUpdatedRecognitions() will return null if no new information is available since
+                // the last time that call was made.
+                List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
+                if (updatedRecognitions != null) {
+                    telemetry.addData("# Object Detected", updatedRecognitions.size());
+                    if (updatedRecognitions.size() == 3) {
+                        int goldMineralX = -1;
+                        int silverMineral1X = -1;
+                        int silverMineral2X = -1;
+                        for (Recognition recognition : updatedRecognitions) {
+                            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
+                                goldMineralX = (int) recognition.getLeft();
+                            } else if (silverMineral1X == -1) {
+                                silverMineral1X = (int) recognition.getLeft();
+                            } else {
+                                silverMineral2X = (int) recognition.getLeft();
+                            }
+                        }
+                        if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
+                            if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
+                                telemetry.addData("Gold Mineral Position", "Left");
+                            } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
+                                telemetry.addData("Gold Mineral Position", "Right");
+                            } else {
+                                telemetry.addData("Gold Mineral Position", "Center");
+                            }
+                        }
+                    }
+                    telemetry.update();
+                }
+            }
+        }
+
+        if (tfod != null) {
+            tfod.shutdown();
+        }
+
+        // turn the motors off.
+        bottomRight.setPower(0);
+        bottomLeft.setPower(0);
+    }
+    public void drive(double power,double inch){
+
+        bottomLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bottomRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        topLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        topRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        bottomRight.setTargetPosition((int)(bottomRight.getCurrentPosition() + inch * ticksPerInch));
+        bottomLeft.setTargetPosition((int)(bottomLeft.getCurrentPosition() + inch * ticksPerInch));
+
+        bottomLeft.setPower(power);
+        bottomRight.setPower(power);
+
+        while (bottomRight.isBusy() && bottomLeft.isBusy());
+        bottomLeft.setPower(0);
+        bottomRight.setPower(0);
+
+    }
+
+    public void imuTurn (  double speed, double angle) {
+
+        bottomLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bottomRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        topLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        topRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        // keep looping while we are still active, and not on heading.
+        while (opModeIsActive() && !onHeading(speed, angle, 0.1)) {
+            // Update telemetry & Allow time for other processes to run.
+
+            telemetry.addData("DD",heading);
             telemetry.update();
-
-            
         }
 
-        // turn the motors off.
-        bottomRight.setPower(0);
-        bottomLeft.setPower(0);
+    }
+
+    public void imuTurn2 (  double speed, double angle) {
+
+        // keep looping while we are still active, and not on heading.
+        while (opModeIsActive() && !onHeadingNegative(speed, angle, 0.1)) {
+            // Update telemetry & Allow time for other processes to run.
+
+            telemetry.addData("DD",heading);
+            telemetry.update();
+        }
+
+    }
+
+    boolean onHeading(double speed, double angle, double PCoeff) {
+
+        double   error ;
+        double   steer ;
+        boolean  onTarget = false ;
+        double leftSpeed;
+        double rightSpeed;
+
+        returnAngles();
+
+        bottomLeft.setPower(-speed);
+        topLeft.setPower(-speed);
+        bottomRight.setPower(speed);
+        topRight.setPower(speed);
+
+        if(heading > angle){
+            onTarget = true;
+        }
+
+        return onTarget;
+    }
+
+    boolean onHeadingNegative(double speed, double angle, double PCoeff) {
+
+        double   error ;
+        double   steer ;
+        boolean  onTarget = false ;
+        double leftSpeed;
+        double rightSpeed;
+
+        returnAngles();
+
+        bottomLeft.setPower(-speed);
+        topLeft.setPower(-speed);
+        bottomRight.setPower(-speed);
+        topRight.setPower(-speed);
+
+        if(heading < angle){
+            onTarget = true;
+        }
+
+        return onTarget;
+    }
+
+    static String formatAngle(AngleUnit angleUnit, double angle) {
+        return formatDegrees(AngleUnit.DEGREES.fromUnit(angleUnit, angle));
+    }
+
+    static String formatDegrees(double degrees){
+        return String.format(Locale.getDefault(), "%.1f", AngleUnit.DEGREES.normalize(degrees));
+    }
+
+    public static void returnAngles(){
+        //starting IMU
+        angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        //return necessary angle
+        heading = Double.parseDouble(formatAngle(angles.angleUnit, angles.firstAngle));
+    }
+
+    //VUDORIA METHODS
+    private void initVuforia() {
+        /*
+         * Configure Vuforia by creating a Parameter object, and passing it to the Vuforia engine.
+         */
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
+
+        parameters.vuforiaLicenseKey = VUFORIA_KEY;
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+
+        //  Instantiate the Vuforia engine
+        vuforia = ClassFactory.getInstance().createVuforia(parameters);
+
+        // Loading trackables is not necessary for the Tensor Flow Object Detection engine.
     }
 
     /**
-     * Resets the cumulative angle tracking to zero.
+     * Initialize the Tensor Flow Object Detection engine.
      */
-    private void resetAngle()
-    {
-        lastAngles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-
-        globalAngle = 0;
-    }
-
-    /**
-     * Get current cumulative angle rotation from last reset.
-     * @return Angle in degrees. + = left, - = right.
-     */
-    private double getAngle()
-    {
-        // We experimentally determined the Z axis is the axis we want to use for heading angle.
-        // We have to process the angle because the imu works in euler angles so the Z axis is
-        // returned as 0 to +180 or 0 to -180 rolling back to -179 or +179 when rotation passes
-        // 180 degrees. We detect this transition and track the total cumulative angle of rotation.
-
-        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-
-        double deltaAngle = angles.firstAngle - lastAngles.firstAngle;
-
-        if (deltaAngle < -180)
-            deltaAngle += 360;
-        else if (deltaAngle > 180)
-            deltaAngle -= 360;
-
-        globalAngle += deltaAngle;
-
-        lastAngles = angles;
-
-        return globalAngle;
-    }
-
-    /**
-     * See if we are moving in a straight line and if not return a power correction value.
-     * @return Power adjustment, + is adjust left - is adjust right.
-     */
-    private double checkDirection()
-    {
-        // The gain value determines how sensitive the correction is to direction changes.
-        // You will have to experiment with your robot to get small smooth direction changes
-        // to stay on a straight line.
-        double correction, angle, gain = .10;
-
-        angle = getAngle();
-
-        if (angle == 0)
-            correction = 0;             // no adjustment.
-        else
-            correction = -angle;        // reverse sign of angle for correction.
-
-        correction = correction * gain;
-
-        return correction;
-    }
-
-    /**
-     * Rotate left or right the number of degrees. Does not support turning more than 180 degrees.
-     * @param degrees Degrees to turn, + is left - is right
-     */
-    private void rotate(int degrees, double power)
-    {
-        double  leftPower, rightPower;
-
-        // restart imu movement tracking.
-        resetAngle();
-
-        // getAngle() returns + when rotating counter clockwise (left) and - when rotating
-        // clockwise (right).
-
-        if (degrees < 0)
-        {   // turn right.
-            leftPower = -power;
-            rightPower = power;
-        }
-        else if (degrees > 0)
-        {   // turn left.
-            leftPower = power;
-            rightPower = -power;
-        }
-        else return;
-
-        // set power to rotate.
-        bottomLeft.setPower(leftPower);
-        bottomRight.setPower(rightPower);
-
-        // rotate until turn is completed.
-        if (degrees < 0)
-        {
-            // On right turn we have to get off zero first.
-            while (opModeIsActive() && getAngle() == 0) {}
-
-            while (opModeIsActive() && getAngle() > degrees) {}
-        }
-        else    // left turn.
-            while (opModeIsActive() && getAngle() < degrees) {}
-
-        // turn the motors off.
-        bottomRight.setPower(0);
-        bottomLeft.setPower(0);
-
-        // wait for rotation to stop.
-        sleep(1000);
-
-        // reset angle tracking on new heading.
-        resetAngle();
+    private void initTfod() {
+        int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
+                "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
+        tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_GOLD_MINERAL, LABEL_SILVER_MINERAL);
     }
 }
