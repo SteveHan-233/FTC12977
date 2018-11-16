@@ -28,7 +28,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 import java.util.List;
 import java.util.Locale;
 
-@Autonomous(name="Drive Avoid Imu", group="Exercises")
+@Autonomous(name="actual stuff", group="Exercises")
 //@Disabled
 public class autoClass extends LinearOpMode
 {
@@ -42,13 +42,17 @@ public class autoClass extends LinearOpMode
     double globalAngle, power = .30, correction;
 
     //encoder info
-    private final static int revTicks = 288;
+    private final static int revTicks = 177;
     private final double wheelDiamerter = 4;
     private final double pi = Math.PI;
     private final double wheelCircumference = wheelDiamerter * pi;
 
     //The value below shows how many ticks there are per inch
     private double ticksPerInch = revTicks/wheelCircumference;
+
+    //outcomes
+    boolean foundGold = false;
+    int stage = 0;
 
     //Gyrostuff
     static Orientation angles;
@@ -144,25 +148,16 @@ public class autoClass extends LinearOpMode
 
         waitForStart();
 
+        start();
+
         telemetry.addData("Mode", "running");
         telemetry.update();
 
         sleep(1000);
 
-        // drive until end of period.
 
-        /**
-        ////////////////////////////////////////////////////////////////////////////
-         ////////////////////////////////////////////////////////////////////////////
-         __      __   __          _                    _          __  __  __  __  __
-         \ \    / / / _|         (_)                  | |        / _|/ _|/ _|/ _|/ _|
-         \ \  / /  | |_ ___  _ __ _  __ _          ___| |_ _   _| |_| |_| |_| |_| |_
-         \ \/ /| | |  _/ _ \|'__| |/ _` |        / __| __| | | |  _|  _|  _|  _|  _|
-         \  /| |_| | || (_)| |  | | (_| |        \__ \ |_| |_| | | | | | | | | | |
-         \/  \__,_|_| \___/|_|  |_|\__,_|        |___/\__|\__,_|_| |_| |_| |_| |_|
-         ///////////////////////////////////////////////////////////////////////////
-         ////////////////////////////////////////////////////////////////////////////
-         **/
+
+
 
 
 
@@ -170,9 +165,24 @@ public class autoClass extends LinearOpMode
             tfod.activate();
         }
 
+
+
         while (opModeIsActive())
         {
 
+
+            /**
+             ////////////////////////////////////////////////////////////////////////////
+             ////////////////////////////////////////////////////////////////////////////
+             __      __   __          _                    _          __  __  __  __  __
+             \ \    / / / _|         (_)                  | |        / _|/ _|/ _|/ _|/ _|
+             \ \  / /  | |_ ___  _ __ _  __ _          ___| |_ _   _| |_| |_| |_| |_| |_
+             \ \/ /| | |  _/ _ \|'__| |/ _` |        / __| __| | | |  _|  _|  _|  _|  _|
+             \  /| |_| | || (_)| |  | | (_| |        \__ \ |_| |_| | | | | | | | | | |
+             \/  \__,_|_| \___/|_|  |_|\__,_|        |___/\__|\__,_|_| |_| |_| |_| |_|
+             ///////////////////////////////////////////////////////////////////////////
+             ////////////////////////////////////////////////////////////////////////////
+             **/
             if (tfod != null) {
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
@@ -181,30 +191,12 @@ public class autoClass extends LinearOpMode
                     telemetry.addData("# Object Detected", updatedRecognitions.size());
                     for (Recognition recognition : updatedRecognitions) {
                         telemetry.addData("object", recognition.getLabel());
-                        telemetry.addData("left", recognition.getLeft());
+                        if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
 
-//                        int goldMineralX = -1;
-//                        int silverMineral1X = -1;
-//                        int silverMineral2X = -1;
-//                        for (Recognition recognition : updatedRecognitions) {
-//                            if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
-//                                goldMineralX = (int) recognition.getLeft();
-//                            } else if (silverMineral1X == -1) {
-//                                silverMineral1X = (int) recognition.getLeft();
-//                            } else {
-//                                silverMineral2X = (int) recognition.getLeft();
-//                            }
+                        } else {
+
                         }
-//                        if (goldMineralX != -1 && silverMineral1X != -1 && silverMineral2X != -1) {
-//                            if (goldMineralX < silverMineral1X && goldMineralX < silverMineral2X) {
-//                                telemetry.addData("Gold Mineral Position", "Left");
-//                            } else if (goldMineralX > silverMineral1X && goldMineralX > silverMineral2X) {
-//                                telemetry.addData("Gold Mineral Position", "Right");
-//                            } else {
-//                                telemetry.addData("Gold Mineral Position", "Center");
-//                            }
-//                        }
-//                    }
+                    }
                     telemetry.update();
                 }
             }
@@ -217,26 +209,49 @@ public class autoClass extends LinearOpMode
         // turn the motors off.
         bottomRight.setPower(0);
         bottomLeft.setPower(0);
+        topRight.setPower(0);
+        topLeft.setPower(0);
     }
     public void drive(double power,double inch){
 
-        bottomLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        bottomRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        topLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        topRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        topRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        topRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        bottomRight.setTargetPosition((int)(bottomRight.getCurrentPosition() + inch * ticksPerInch));
-        bottomLeft.setTargetPosition((int)(bottomLeft.getCurrentPosition() + inch * ticksPerInch));
+        topRight.setTargetPosition((int)(bottomRight.getCurrentPosition() + inch * ticksPerInch));
 
-        bottomLeft.setPower(power);
-        bottomRight.setPower(power);
+        topRight.setPower(power);
 
-        while (bottomRight.isBusy() && bottomLeft.isBusy());
-        bottomLeft.setPower(0);
+
+        while (topRight.isBusy()) {
+            topLeft.setPower(power);
+            topRight.setPower(power);
+            bottomRight.setPower(power);
+            telemetry.addData("encoder:", topRight.getCurrentPosition());
+            telemetry.update();
+        }
+        topLeft.setPower(0);
+        topRight.setPower(0);
         bottomRight.setPower(0);
-
     }
 
+    // goes left
+    public void driveSide(double inch) {
+        bottomLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        bottomRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        topLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        topRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        bottomRight.setTargetPosition((int)(bottomRight.getCurrentPosition() + inch * ticksPerInch));
+        topLeft.setTargetPosition((int)(bottomLeft.getCurrentPosition() + inch * ticksPerInch));
+
+        topLeft.setPower(.5);
+        bottomRight.setPower(.5);
+
+        while (bottomRight.isBusy() && topLeft.isBusy()) {
+            bottomLeft.setPower(-.5);
+            topRight.setPower(-.5);
+        }
+    }
     public void imuTurn (  double speed, double angle) {
 
         bottomLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -305,6 +320,10 @@ public class autoClass extends LinearOpMode
 
         if(heading < angle){
             onTarget = true;
+            bottomLeft.setPower(0);
+            topLeft.setPower(0);
+            bottomRight.setPower(0);
+            topRight.setPower(0);
         }
 
         return onTarget;
