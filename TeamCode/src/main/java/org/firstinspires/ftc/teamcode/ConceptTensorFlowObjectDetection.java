@@ -115,6 +115,7 @@ public class ConceptTensorFlowObjectDetection extends LinearOpMode {
                         telemetry.addData("# Object Detected", updatedRecognitions.size());
                         if (updatedRecognitions.size() == 1) {
                             telemetry.addData("object:", updatedRecognitions.get(0).getLabel());
+
 //                        int goldMineralX = -1;
 //                        int silverMineral1X = -1;
 //                        int silverMineral2X = -1;

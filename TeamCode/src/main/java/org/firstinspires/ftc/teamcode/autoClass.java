@@ -181,6 +181,8 @@ public class autoClass extends LinearOpMode
                     telemetry.addData("# Object Detected", updatedRecognitions.size());
                     for (Recognition recognition : updatedRecognitions) {
                         telemetry.addData("object", recognition.getLabel());
+                        telemetry.addData("left", recognition.getLeft());
+
 //                        int goldMineralX = -1;
 //                        int silverMineral1X = -1;
 //                        int silverMineral2X = -1;
