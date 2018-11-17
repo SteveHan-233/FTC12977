@@ -153,24 +153,31 @@ public class autoClass extends LinearOpMode
         telemetry.addData("Mode", "running");
         telemetry.update();
 
-        sleep(1000);
+//        sleep(1000);
+        drive(.5,10);
+        driveSide(.5,10);
+//        drive(.7, 2);
+//        if(detectGold()) {
+//            drive(.7, 10);
+//        } else {
+//            imuTurn(.4,30);
+//            if(detectGold()){
+//                drive(.7, 10);
+//            } else {
+//                imuTurn(.4,-60);
+//                drive(.7,10);
+//            }
+//        }
 
+    }
 
+    public boolean detectGold() {
 
-
-
-
-
-        if (tfod != null) {
-            tfod.activate();
-        }
-
-
-
-        while (opModeIsActive())
-        {
-
-
+            if (tfod != null) {
+                tfod.activate();
+            }
+            boolean result = false;
+            boolean detected = false;
             /**
              ////////////////////////////////////////////////////////////////////////////
              ////////////////////////////////////////////////////////////////////////////
@@ -183,35 +190,33 @@ public class autoClass extends LinearOpMode
              ///////////////////////////////////////////////////////////////////////////
              ////////////////////////////////////////////////////////////////////////////
              **/
+        do {
             if (tfod != null) {
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
                 List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                 if (updatedRecognitions != null) {
+                    if(updatedRecognitions.size() == 1) {
+                        detected = true;
+                    }
                     telemetry.addData("# Object Detected", updatedRecognitions.size());
                     for (Recognition recognition : updatedRecognitions) {
                         telemetry.addData("object", recognition.getLabel());
                         if (recognition.getLabel().equals(LABEL_GOLD_MINERAL)) {
-
-                        } else {
-
+                            result = true;
                         }
                     }
                     telemetry.update();
                 }
             }
-        }
+        } while(!detected);
+            if (tfod != null) {
+                tfod.shutdown();
+            }
 
-        if (tfod != null) {
-            tfod.shutdown();
-        }
-
-        // turn the motors off.
-        bottomRight.setPower(0);
-        bottomLeft.setPower(0);
-        topRight.setPower(0);
-        topLeft.setPower(0);
+        return result;
     }
+
     public void drive(double power,double inch){
 
         topRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -224,33 +229,40 @@ public class autoClass extends LinearOpMode
 
         while (topRight.isBusy()) {
             topLeft.setPower(power);
-            topRight.setPower(power);
+            bottomLeft.setPower(power);
             bottomRight.setPower(power);
             telemetry.addData("encoder:", topRight.getCurrentPosition());
             telemetry.update();
         }
         topLeft.setPower(0);
-        topRight.setPower(0);
+        bottomLeft.setPower(0);
         bottomRight.setPower(0);
     }
 
     // goes left
-    public void driveSide(double inch) {
-        bottomLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        bottomRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        topLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+    public void driveSide(double power, double inch) {
+        topRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         topRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-        bottomRight.setTargetPosition((int)(bottomRight.getCurrentPosition() + inch * ticksPerInch));
-        topLeft.setTargetPosition((int)(bottomLeft.getCurrentPosition() + inch * ticksPerInch));
+        topLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bottomLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bottomRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        topLeft.setPower(.5);
-        bottomRight.setPower(.5);
+        topRight.setTargetPosition((int)(bottomRight.getCurrentPosition() + inch * ticksPerInch));
 
-        while (bottomRight.isBusy() && topLeft.isBusy()) {
-            bottomLeft.setPower(-.5);
-            topRight.setPower(-.5);
+        topRight.setPower(power);
+
+
+        while (topRight.isBusy()) {
+            topLeft.setPower(-power);
+            bottomLeft.setPower(power);
+            bottomRight.setPower(-power);
+            telemetry.addData("encoder:", topRight.getCurrentPosition());
+            telemetry.update();
         }
+        topLeft.setPower(0);
+        bottomLeft.setPower(0);
+        bottomRight.setPower(0);
     }
     public void imuTurn (  double speed, double angle) {
 
@@ -296,8 +308,13 @@ public class autoClass extends LinearOpMode
         bottomRight.setPower(speed);
         topRight.setPower(speed);
 
-        if(heading > angle){
+        if(heading > angle - 5){
             onTarget = true;
+            bottomLeft.setPower(0);
+            topLeft.setPower(0);
+            bottomRight.setPower(0);
+            topRight.setPower(0);
+
         }
 
         return onTarget;
@@ -324,6 +341,7 @@ public class autoClass extends LinearOpMode
             topLeft.setPower(0);
             bottomRight.setPower(0);
             topRight.setPower(0);
+
         }
 
         return onTarget;
