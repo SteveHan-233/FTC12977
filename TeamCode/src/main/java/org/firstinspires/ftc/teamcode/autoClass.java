@@ -153,21 +153,42 @@ public class autoClass extends LinearOpMode
         telemetry.addData("Mode", "running");
         telemetry.update();
 
-//        sleep(1000);
-        drive(.5,10);
-        driveSide(.5,10);
-//        drive(.7, 2);
-//        if(detectGold()) {
-//            drive(.7, 10);
-//        } else {
-//            imuTurn(.4,30);
-//            if(detectGold()){
-//                drive(.7, 10);
-//            } else {
-//                imuTurn(.4,-60);
-//                drive(.7,10);
-//            }
-//        }
+        topRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        topLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bottomLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bottomRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        topRight.setPower(-.75);
+        bottomRight.setPower(.75);
+        topLeft.setPower(.75);
+        bottomLeft.setPower(-.75);
+
+        sleep(500);
+        topRight.setPower(0);
+        bottomRight.setPower(0);
+        topLeft.setPower(0);
+        bottomLeft.setPower(0);
+
+        sleep(1000);
+
+        if(detectGold()) {
+            imuTurn2(.4,-90);
+            drive(.4, 10);
+        } else {
+            imuTurn(.4,30);
+            sleep(1000);
+            if(detectGold()){
+                telemetry.addData("gold!", "yeah");
+
+                imuTurn2(.4,-60);
+                drive(.4, 10);
+            } else {
+                imuTurn2(.4,-60);
+                sleep(1000);
+                imuTurn2(.4,-120);
+                drive(.4,10);
+            }
+        }
 
     }
 
@@ -190,7 +211,9 @@ public class autoClass extends LinearOpMode
              ///////////////////////////////////////////////////////////////////////////
              ////////////////////////////////////////////////////////////////////////////
              **/
+            int i = 0;
         do {
+            i++;
             if (tfod != null) {
                 // getUpdatedRecognitions() will return null if no new information is available since
                 // the last time that call was made.
@@ -209,15 +232,15 @@ public class autoClass extends LinearOpMode
                     telemetry.update();
                 }
             }
-        } while(!detected);
-            if (tfod != null) {
-                tfod.shutdown();
-            }
+        } while(!detected && i < 5000000);
 
         return result;
     }
 
     public void drive(double power,double inch){
+        bottomLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bottomRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        topLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         topRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         topRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -283,6 +306,11 @@ public class autoClass extends LinearOpMode
 
     public void imuTurn2 (  double speed, double angle) {
 
+        bottomLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        bottomRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        topLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        topRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         // keep looping while we are still active, and not on heading.
         while (opModeIsActive() && !onHeadingNegative(speed, angle, 0.1)) {
             // Update telemetry & Allow time for other processes to run.
@@ -330,12 +358,12 @@ public class autoClass extends LinearOpMode
 
         returnAngles();
 
-        bottomLeft.setPower(-speed);
-        topLeft.setPower(-speed);
+        bottomLeft.setPower(speed);
+        topLeft.setPower(speed);
         bottomRight.setPower(-speed);
         topRight.setPower(-speed);
 
-        if(heading < angle){
+        if(heading < angle + 5){
             onTarget = true;
             bottomLeft.setPower(0);
             topLeft.setPower(0);
